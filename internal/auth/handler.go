@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 
@@ -159,7 +160,11 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	_ = h.authService.Logout(r.Context(), token)
+	if token != "" && h.authService != nil {
+		if err := h.authService.Logout(r.Context(), token); err != nil && !errors.Is(err, domain.ErrNotFound) {
+			log.Printf("[AuthHandler] Failed to invalidate session: %v", err)
+		}
+	}
 	ClearSessionCookie(w)
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }

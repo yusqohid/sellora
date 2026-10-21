@@ -1,7 +1,9 @@
 package product
 
 import (
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -41,12 +43,20 @@ func (h *Handler) Dashboard(w http.ResponseWriter, r *http.Request) {
 
 	var total, published, drafts int
 	if h.productRepo != nil {
-		total, published, drafts, _ = h.productRepo.CountStats(r.Context())
+		var err error
+		total, published, drafts, err = h.productRepo.CountStats(r.Context())
+		if err != nil {
+			log.Printf("[ProductHandler] Failed to count product stats: %v", err)
+		}
 	}
 
 	var recentProducts []domain.Product
 	if h.service != nil {
-		recentProducts, _, _ = h.service.ListProducts(r.Context(), "", "all", 1, 5)
+		var err error
+		recentProducts, _, err = h.service.ListProducts(r.Context(), "", "all", 1, 5)
+		if err != nil {
+			log.Printf("[ProductHandler] Failed to list recent products: %v", err)
+		}
 	}
 
 	_ = h.view.Render(w, "admin", "admin/dashboard", map[string]any{
@@ -73,7 +83,11 @@ func (h *Handler) ListProducts(w http.ResponseWriter, r *http.Request) {
 	var products []domain.Product
 	var total int
 	if h.service != nil {
-		products, total, _ = h.service.ListProducts(r.Context(), search, status, 1, 50)
+		var err error
+		products, total, err = h.service.ListProducts(r.Context(), search, status, 1, 50)
+		if err != nil {
+			log.Printf("[ProductHandler] Failed to list products: %v", err)
+		}
 	}
 
 	_ = h.view.Render(w, "admin", "admin/products/index", map[string]any{
@@ -308,7 +322,11 @@ func (h *Handler) DeleteFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = h.service.DeleteFile(r.Context(), fileID)
+	if err := h.service.DeleteFile(r.Context(), fileID); err != nil && !errors.Is(err, domain.ErrNotFound) {
+		log.Printf("[ProductHandler] Failed to delete file %d for product %d: %v", fileID, productID, err)
+		http.Error(w, fmt.Sprintf("Failed to delete file: %v", err), http.StatusInternalServerError)
+		return
+	}
 	http.Redirect(w, r, fmt.Sprintf("/admin/products/%d/files", productID), http.StatusSeeOther)
 }
 
@@ -320,7 +338,11 @@ func (h *Handler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = h.service.DeleteProduct(r.Context(), id)
+	if err := h.service.DeleteProduct(r.Context(), id); err != nil && !errors.Is(err, domain.ErrNotFound) {
+		log.Printf("[ProductHandler] Failed to delete product %d: %v", id, err)
+		http.Error(w, fmt.Sprintf("Failed to delete product: %v", err), http.StatusInternalServerError)
+		return
+	}
 	http.Redirect(w, r, "/admin/products", http.StatusSeeOther)
 }
 
@@ -397,6 +419,10 @@ func (h *Handler) DeleteImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = h.service.DeleteProductImage(r.Context(), productID, imageID)
+	if err := h.service.DeleteProductImage(r.Context(), productID, imageID); err != nil && !errors.Is(err, domain.ErrNotFound) {
+		log.Printf("[ProductHandler] Failed to delete image %d for product %d: %v", imageID, productID, err)
+		http.Error(w, fmt.Sprintf("Failed to delete image: %v", err), http.StatusInternalServerError)
+		return
+	}
 	http.Redirect(w, r, fmt.Sprintf("/admin/products/%d/images", productID), http.StatusSeeOther)
 }

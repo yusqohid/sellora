@@ -116,6 +116,11 @@ func (s *Service) CreateOrder(ctx context.Context, input CreateOrderInput) (*dom
 		totalAmount = 0
 	}
 
+	paymentProviderName := s.paymentProvider.Name()
+	if totalAmount == 0 {
+		paymentProviderName = "free"
+	}
+
 	// 5. Construct order with item snapshot (preserving historical price)
 	order := &domain.Order{
 		Reference:       ref,
@@ -126,7 +131,7 @@ func (s *Service) CreateOrder(ctx context.Context, input CreateOrderInput) (*dom
 		DiscountAmount:  discountAmount,
 		CouponID:        couponID,
 		Currency:        "IDR",
-		PaymentProvider: s.paymentProvider.Name(),
+		PaymentProvider: paymentProviderName,
 		Items: []domain.OrderItem{
 			{
 				ProductID:   product.ID,
@@ -141,7 +146,20 @@ func (s *Service) CreateOrder(ctx context.Context, input CreateOrderInput) (*dom
 		return nil, "", fmt.Errorf("failed to save order: %w", err)
 	}
 
-	// 6. Request payment checkout URL from external/mock provider
+	// 7. For free orders ($0 total amount via zero price or 100% coupon), bypass payment gateway
+	if totalAmount == 0 {
+		if err := s.orderRepo.UpdateStatus(ctx, order.ID, domain.StatusPaid, "FREE_ORDER"); err != nil {
+			return nil, "", fmt.Errorf("failed to mark free order as paid: %w", err)
+		}
+		order.Status = domain.StatusPaid
+		order.PaymentReference = "FREE_ORDER"
+		s.handleOrderPaid(order.ID)
+
+		successURL := fmt.Sprintf("/orders/%s/success", order.Reference)
+		return order, successURL, nil
+	}
+
+	// 8. Request payment checkout URL from external/mock provider
 	checkoutURL, err := s.paymentProvider.CreateCheckout(ctx, order)
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to create payment checkout: %w", err)

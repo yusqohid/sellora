@@ -2,6 +2,7 @@ package product_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -249,5 +250,69 @@ func TestProductHandler_Images(t *testing.T) {
 	imagesAfter, _ := service.ListProductImages(ctx, prod.ID)
 	if len(imagesAfter) != 0 {
 		t.Errorf("expected 0 images after delete, got %d", len(imagesAfter))
+	}
+}
+
+type errorDeleteProductRepo struct {
+	*MockProductRepository
+}
+
+func (e *errorDeleteProductRepo) Delete(ctx context.Context, id int64) error {
+	return errors.New("foreign key constraint violation")
+}
+
+func TestProductHandler_DeleteProduct(t *testing.T) {
+	productRepo := NewMockProductRepository()
+	fileRepo := NewMockProductFileRepository()
+	imageRepo := NewMockProductImageRepository()
+	tempDir := t.TempDir()
+	storageMgr, _ := storage.New(tempDir)
+	service := product.NewService(productRepo, fileRepo, imageRepo, storageMgr)
+	viewRenderer := view.New(templates.FS, true)
+	handler := product.NewHandler(service, nil, viewRenderer, "mock")
+	ctx := context.Background()
+
+	adminUser := &domain.User{ID: 1, Role: domain.RoleAdmin}
+	prod, _ := service.CreateProduct(ctx, product.CreateProductInput{
+		Name:  "Product to Delete",
+		Price: 50000,
+	})
+
+	r := chi.NewRouter()
+	r.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			next.ServeHTTP(w, req.WithContext(auth.WithUser(req.Context(), adminUser)))
+		})
+	})
+	r.Post("/admin/products/{id}/delete", handler.DeleteProduct)
+
+	// 1. Success delete redirects to /admin/products
+	req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/admin/products/%d/delete", prod.ID), nil)
+	rec := httptest.NewRecorder()
+	r.ServeHTTP(rec, req)
+	if rec.Code != http.StatusSeeOther {
+		t.Errorf("expected 303 redirect from DeleteProduct, got %d", rec.Code)
+	}
+
+	// 2. Error delete returns 500 instead of swallowing
+	errRepo := &errorDeleteProductRepo{MockProductRepository: productRepo}
+	prodWithFK := &domain.Product{Name: "Purchased Prod", Price: 10000, Slug: "purchased-prod"}
+	_ = errRepo.Create(ctx, prodWithFK)
+	errService := product.NewService(errRepo, fileRepo, imageRepo, storageMgr)
+	errHandler := product.NewHandler(errService, nil, viewRenderer, "mock")
+
+	rErr := chi.NewRouter()
+	rErr.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			next.ServeHTTP(w, req.WithContext(auth.WithUser(req.Context(), adminUser)))
+		})
+	})
+	rErr.Post("/admin/products/{id}/delete", errHandler.DeleteProduct)
+
+	reqErr := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/admin/products/%d/delete", prodWithFK.ID), nil)
+	recErr := httptest.NewRecorder()
+	rErr.ServeHTTP(recErr, reqErr)
+	if recErr.Code != http.StatusInternalServerError {
+		t.Errorf("expected 500 InternalServerError from DeleteProduct on error, got %d", recErr.Code)
 	}
 }

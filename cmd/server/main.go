@@ -166,30 +166,32 @@ func main() {
 	workerCtx, stopWorker := context.WithCancel(context.Background())
 	defer stopWorker()
 
-	go func() {
-		ticker := time.NewTicker(1 * time.Hour)
-		defer ticker.Stop()
+	if authService != nil {
+		go func() {
+			ticker := time.NewTicker(1 * time.Hour)
+			defer ticker.Stop()
 
-		// Run an initial cleanup on startup
-		cleanCtx, cleanCancel := context.WithTimeout(workerCtx, 15*time.Second)
-		if err := authService.CleanupExpiredSessions(cleanCtx); err != nil && !errors.Is(err, context.Canceled) {
-			log.Printf("[Worker] Initial expired session cleanup failed: %v", err)
-		}
-		cleanCancel()
-
-		for {
-			select {
-			case <-ticker.C:
-				cCtx, cCancel := context.WithTimeout(workerCtx, 15*time.Second)
-				if err := authService.CleanupExpiredSessions(cCtx); err != nil && !errors.Is(err, context.Canceled) {
-					log.Printf("[Worker] Periodic expired session cleanup failed: %v", err)
-				}
-				cCancel()
-			case <-workerCtx.Done():
-				return
+			// Run an initial cleanup on startup
+			cleanCtx, cleanCancel := context.WithTimeout(workerCtx, 15*time.Second)
+			if err := authService.CleanupExpiredSessions(cleanCtx); err != nil && !errors.Is(err, context.Canceled) {
+				log.Printf("[Worker] Initial expired session cleanup failed: %v", err)
 			}
-		}
-	}()
+			cleanCancel()
+
+			for {
+				select {
+				case <-ticker.C:
+					cCtx, cCancel := context.WithTimeout(workerCtx, 15*time.Second)
+					if err := authService.CleanupExpiredSessions(cCtx); err != nil && !errors.Is(err, context.Canceled) {
+						log.Printf("[Worker] Periodic expired session cleanup failed: %v", err)
+					}
+					cCancel()
+				case <-workerCtx.Done():
+					return
+				}
+			}
+		}()
+	}
 
 	// 7. Start HTTP server in a separate goroutine
 	go func() {

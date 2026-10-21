@@ -659,3 +659,100 @@ func TestService_ProcessPaymentResult_NoDoubleCountOnRetry(t *testing.T) {
 	}
 }
 
+func TestService_CreateOrder_ZeroTotal_FreeProduct(t *testing.T) {
+	orderRepo := NewMockOrderRepo()
+	productRepo := NewMockProductRepo()
+	paymentProv := &MockPaymentProvider{}
+	service := order.NewService(orderRepo, productRepo, nil, paymentProv, nil)
+	ctx := context.Background()
+
+	customer := &domain.User{ID: 15, Name: "Freebie User", Email: "free@example.com"}
+	product := &domain.Product{
+		ID:     50,
+		Name:   "Free Guide",
+		Price:  0, // Free product
+		Status: domain.StatusPublished,
+	}
+	_ = productRepo.Create(ctx, product)
+
+	ord, redirectURL, err := service.CreateOrder(ctx, order.CreateOrderInput{
+		Customer:  customer,
+		ProductID: product.ID,
+	})
+	if err != nil {
+		t.Fatalf("unexpected error creating free order: %v", err)
+	}
+
+	if ord.Status != domain.StatusPaid {
+		t.Errorf("expected free order to be marked StatusPaid directly, got %s", ord.Status)
+	}
+	if ord.TotalAmount != 0 {
+		t.Errorf("expected total amount to be 0, got %d", ord.TotalAmount)
+	}
+	if ord.PaymentProvider != "free" {
+		t.Errorf("expected payment provider to be 'free', got %s", ord.PaymentProvider)
+	}
+	expectedSuccessURL := "/orders/" + ord.Reference + "/success"
+	if redirectURL != expectedSuccessURL {
+		t.Errorf("expected redirectURL %q, got %q", expectedSuccessURL, redirectURL)
+	}
+}
+
+func TestService_CreateOrder_ZeroTotal_100PercentCoupon(t *testing.T) {
+	orderRepo := NewMockOrderRepo()
+	productRepo := NewMockProductRepo()
+	couponRepo := NewMockOrderCouponRepo()
+	paymentProv := &MockPaymentProvider{}
+	service := order.NewService(orderRepo, productRepo, couponRepo, paymentProv, nil)
+	ctx := context.Background()
+
+	customer := &domain.User{ID: 25, Name: "Coupon User", Email: "coupon@example.com"}
+	product := &domain.Product{
+		ID:     60,
+		Name:   "Paid Course",
+		Price:  150000,
+		Status: domain.StatusPublished,
+	}
+	_ = productRepo.Create(ctx, product)
+
+	couponID := int64(99)
+	_ = couponRepo.Create(ctx, &domain.Coupon{
+		ID:            couponID,
+		Code:          "GRATIS100",
+		DiscountType:  domain.DiscountTypePercentage,
+		DiscountValue: 100,
+		IsActive:      true,
+		UsedCount:     0,
+	})
+
+	ord, redirectURL, err := service.CreateOrder(ctx, order.CreateOrderInput{
+		Customer:   customer,
+		ProductID:  product.ID,
+		CouponCode: "gratis100",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error creating order with 100%% coupon: %v", err)
+	}
+
+	if ord.Status != domain.StatusPaid {
+		t.Errorf("expected 100%% discount order to be marked StatusPaid directly, got %s", ord.Status)
+	}
+	if ord.TotalAmount != 0 {
+		t.Errorf("expected total amount to be 0, got %d", ord.TotalAmount)
+	}
+	if ord.DiscountAmount != 150000 {
+		t.Errorf("expected discount amount to be 150000, got %d", ord.DiscountAmount)
+	}
+	expectedSuccessURL := "/orders/" + ord.Reference + "/success"
+	if redirectURL != expectedSuccessURL {
+		t.Errorf("expected redirectURL %q, got %q", expectedSuccessURL, redirectURL)
+	}
+
+	// Wait briefly for goroutine to increment coupon
+	time.Sleep(50 * time.Millisecond)
+	c, _ := couponRepo.FindByID(ctx, couponID)
+	if c.UsedCount != 1 {
+		t.Errorf("expected coupon used_count to be incremented to 1, got %d", c.UsedCount)
+	}
+}
+

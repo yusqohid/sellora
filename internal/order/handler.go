@@ -103,6 +103,9 @@ func (h *Handler) CheckoutPage(w http.ResponseWriter, r *http.Request) {
 			appliedCoupon = c
 			discountAmount = disc
 			totalAmount = product.Price - disc
+			if totalAmount < 0 {
+				totalAmount = 0
+			}
 			couponSuccess = fmt.Sprintf("Coupon %s applied successfully!", c.Code)
 		}
 	}
@@ -161,6 +164,9 @@ func (h *Handler) ApplyCoupon(w http.ResponseWriter, r *http.Request) {
 			appliedCoupon = c
 			discountAmount = disc
 			totalAmount = product.Price - disc
+			if totalAmount < 0 {
+				totalAmount = 0
+			}
 			couponSuccess = fmt.Sprintf("Coupon %s applied successfully!", c.Code)
 		}
 	}
@@ -282,9 +288,11 @@ func (h *Handler) ProcessCheckout(w http.ResponseWriter, r *http.Request) {
 	// Return JSON response for AJAX / HTMX requests to allow in-page Snap modal payment
 	if r.Header.Get("HX-Request") == "true" || strings.Contains(r.Header.Get("Accept"), "application/json") {
 		token := ""
-		parts := strings.Split(strings.TrimRight(checkoutURL, "/"), "/")
-		if len(parts) > 0 {
-			token = parts[len(parts)-1]
+		if order.TotalAmount > 0 && h.paymentProvider == "midtrans" {
+			parts := strings.Split(strings.TrimRight(checkoutURL, "/"), "/")
+			if len(parts) > 0 {
+				token = parts[len(parts)-1]
+			}
 		}
 
 		w.Header().Set("Content-Type", "application/json")
