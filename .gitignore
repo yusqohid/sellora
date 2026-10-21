@@ -1,7 +1,4 @@
-.agents
 .env
-AGENTS.md
-PRD.md
 *~
 bin/
 tmp/
