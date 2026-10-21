@@ -4,9 +4,9 @@
   <!-- Page Header (Spark Pro Style) -->
   <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
     <div>
-      <h1 class="h3 fw-bold text-main mb-1">Katalog Produk Digital</h1>
+      <h1 class="h3 fw-bold text-main mb-1">Digital Products Catalog</h1>
       <p class="text-muted-green small mb-0">
-        Pilihan template, boilerplate, dan aset digital siap pakai untuk mempercepat proyek Anda.
+        Curated templates, boilerplates, and digital assets ready to accelerate your projects.
       </p>
     </div>
   </div>
@@ -20,7 +20,7 @@
           type="search" 
           name="q" 
           value="{{ .Search }}"
-          placeholder="Cari produk digital..."
+          placeholder="Search digital products..."
           class="catalog-search-input"
           hx-get="/products"
           hx-trigger="keyup changed delay:300ms, search"
@@ -31,7 +31,7 @@
           autocomplete="off"
         >
         <div id="search-spinner" class="spinner-border spinner-border-sm catalog-search-spinner htmx-indicator" role="status">
-          <span class="visually-hidden">Memuat...</span>
+          <span class="visually-hidden">Loading...</span>
         </div>
       </div>
     </div>
@@ -41,15 +41,15 @@
   <div id="product-grid">
     <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
       <div class="text-muted-green small">
-        Menampilkan <strong>{{ len .Products }}</strong> dari <strong>{{ .Total }}</strong> produk
+        Showing <strong>{{ len .Products }}</strong> of <strong>{{ .Total }}</strong> products
         {{ if .Search }}
-          untuk pencarian <span class="badge bg-white text-dark border ms-1">&ldquo;{{ .Search }}&rdquo;</span>
+          for search <span class="badge bg-white text-dark border ms-1">&ldquo;{{ .Search }}&rdquo;</span>
         {{ end }}
       </div>
 
       {{ if .Search }}
         <a href="/products" class="btn-spark-outline py-1 px-3 small">
-          <i class="bi bi-x-circle me-1"></i> Hapus Filter
+          <i class="bi bi-x-circle me-1"></i> Clear Filter
         </a>
       {{ end }}
     </div>
@@ -67,7 +67,7 @@
                 {{ else }}
                   <div class="card-cover-placeholder">
                     <i class="bi bi-box-seam fs-2 mb-1 text-muted-green"></i>
-                    <span class="fs-12 fw-semibold text-muted-green">Produk Digital</span>
+                    <span class="fs-12 fw-semibold text-muted-green">Digital Product</span>
                   </div>
                 {{ end }}
               </div>
@@ -80,7 +80,7 @@
                       Digital Asset
                     </span>
                     <span class="text-muted-green fs-12">
-                      <i class="bi bi-shield-check me-1"></i>Tervalidasi
+                      <i class="bi bi-shield-check me-1"></i>Verified
                     </span>
                   </div>
 
@@ -95,11 +95,11 @@
                 <!-- Card Footer Action Row -->
                 <div class="d-flex align-items-center justify-content-between pt-3 mt-2 border-top">
                   <div>
-                    <span class="fs-11 text-muted-green d-block">Harga</span>
+                    <span class="fs-11 text-muted-green d-block">Price</span>
                     <span class="fw-bold text-main fs-5 product-price">{{ formatMoney .Price }}</span>
                   </div>
                   <a href="/products/{{ .Slug }}" class="btn btn-forest-primary btn-sm px-3">
-                    Lihat Detail &rarr;
+                    View Details &rarr;
                   </a>
                 </div>
               </div>
@@ -110,19 +110,19 @@
 
       <!-- Pagination -->
       {{ if gt .TotalPages 1 }}
-        <nav aria-label="Navigasi halaman katalog" class="d-flex justify-content-center">
+        <nav aria-label="Catalog page navigation" class="d-flex justify-content-center">
           <ul class="pagination">
             <li class="page-item {{ if le .CurrentPage 1 }}disabled{{ end }}">
-              <a class="page-link rounded-pill me-1" href="/products?q={{ .Search }}&page={{ sub .CurrentPage 1 }}" aria-label="Sebelumnya">
-                <span aria-hidden="true">&laquo; Sebelumnya</span>
+              <a class="page-link rounded-pill me-1" href="/products?q={{ .Search }}&page={{ sub .CurrentPage 1 }}" aria-label="Previous">
+                <span aria-hidden="true">&laquo; Previous</span>
               </a>
             </li>
             <li class="page-item disabled">
-              <span class="page-link border-0 text-muted px-3">Halaman {{ .CurrentPage }} dari {{ .TotalPages }}</span>
+              <span class="page-link border-0 text-muted px-3">Page {{ .CurrentPage }} of {{ .TotalPages }}</span>
             </li>
             <li class="page-item {{ if ge .CurrentPage .TotalPages }}disabled{{ end }}">
-              <a class="page-link rounded-pill ms-1" href="/products?q={{ .Search }}&page={{ add .CurrentPage 1 }}" aria-label="Selanjutnya">
-                <span aria-hidden="true">Selanjutnya &raquo;</span>
+              <a class="page-link rounded-pill ms-1" href="/products?q={{ .Search }}&page={{ add .CurrentPage 1 }}" aria-label="Next">
+                <span aria-hidden="true">Next &raquo;</span>
               </a>
             </li>
           </ul>
@@ -133,17 +133,17 @@
       <!-- Empty State -->
       <div class="text-center py-5 bg-white rounded-4 border">
         <i class="bi bi-search fs-1 text-muted mb-3 d-block opacity-50"></i>
-        <h5 class="fw-bold text-dark">Produk Tidak Ditemukan</h5>
+        <h5 class="fw-bold text-dark">No Products Found</h5>
         <p class="text-muted small mb-4" style="max-width: 440px; margin-left: auto; margin-right: auto;">
           {{ if .Search }}
-            Tidak ada produk yang cocok dengan pencarian &ldquo;{{ .Search }}&rdquo;. Coba kata kunci lain atau reset filter.
+            No products matched your search &ldquo;{{ .Search }}&rdquo;. Try another keyword or clear filters.
           {{ else }}
-            Saat ini belum ada produk yang dipublikasikan di katalog.
+            There are currently no products published in the catalog.
           {{ end }}
         </p>
         {{ if .Search }}
           <a href="/products" class="btn-spark-outline px-4">
-            <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Pencarian
+            <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Search
           </a>
         {{ end }}
       </div>

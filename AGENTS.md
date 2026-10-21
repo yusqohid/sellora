@@ -56,7 +56,7 @@ Docker: `docker compose up --build` (db → one-shot `migrate` → `app`). `Dock
 
 ## Conventions
 
-- Language separation: Storefront (customer-facing UI, messages, checkout errors) is strictly in **Bahasa Indonesia**. Admin dashboard (navigation, tables, forms, buttons) is strictly in **English**.
+- Language: Storefront (customer-facing UI, messages, checkout errors) and Admin dashboard are strictly in **English** (targeting international/overseas market).
 - Template pointer handling: Go `html/template` does not support the asterisk pointer dereference operator (`*`). Never write `{{ * .PointerField }}` in templates. Use helper functions from `view.FuncMap()` (e.g. `derefInt`, `derefInt64`, `derefTime`, `formatDateTimeInput`).
 - HTMX endpoints return HTML fragments, not JSON. Keep logic out of templates.
 - HTMX form state synchronization: When partial swaps (e.g. `hx-target="#checkout-summary"` with `hx-swap="outerHTML"`) update dynamic components, all form fields that must be submitted by the main form (such as coupon codes or discount state) must remain synchronized. Put the input field inside the swapped component using HTML5 `form="<form-id>"` (e.g. `<input type="hidden" name="coupon_code" form="checkout-form">`), or use `hx-swap-oob`. Never let a partial swap leave the submitting form with stale or empty state (e.g. UI showing discount applied but form submitting full price).

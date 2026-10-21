@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ if .Title }}{{ .Title }}{{ else }}Sellora - Produk Digital Terkurasi{{ end }}</title>
+  <title>{{ if .Title }}{{ .Title }}{{ else }}Sellora - Curated Digital Products{{ end }}</title>
   {{ if .MetaDesc }}<meta name="description" content="{{ .MetaDesc }}">{{ end }}
 
   <!-- OpenGraph / Social Meta Block -->
   {{ block "meta" . }}
-  <meta property="og:title" content="{{ if .Title }}{{ .Title }}{{ else }}Sellora - Produk Digital Terkurasi{{ end }}">
-  <meta property="og:description" content="{{ if .MetaDesc }}{{ .MetaDesc }}{{ else }}Akses instan ke starter kit, template kode sumber, dan produk digital siap pakai.{{ end }}">
+  <meta property="og:title" content="{{ if .Title }}{{ .Title }}{{ else }}Sellora - Curated Digital Products{{ end }}">
+  <meta property="og:description" content="{{ if .MetaDesc }}{{ .MetaDesc }}{{ else }}Instant access to starter kits, source code templates, and production-ready digital goods.{{ end }}">
   <meta property="og:type" content="website">
   {{ end }}
 
@@ -92,17 +92,17 @@
         <!-- Navigation Links -->
         <ul class="navbar-nav me-auto ms-lg-4 mb-2 mb-lg-0 gap-1">
           <li class="nav-item">
-            <a class="storefront-nav-link {{ if eq .ActiveNav "home" }}active{{ end }}" href="/">Beranda</a>
+            <a class="storefront-nav-link {{ if eq .ActiveNav "home" }}active{{ end }}" href="/">Home</a>
           </li>
           <li class="nav-item">
-            <a class="storefront-nav-link {{ if eq .ActiveNav "catalog" }}active{{ end }}" href="/products">Katalog</a>
+            <a class="storefront-nav-link {{ if eq .ActiveNav "catalog" }}active{{ end }}" href="/products">Catalog</a>
           </li>
         </ul>
 
         <!-- Search Bar Direct to Catalog -->
         <form class="nav-search-wrapper d-none d-lg-block me-3" method="GET" action="/products">
           <i class="bi bi-search nav-search-icon"></i>
-          <input type="search" name="q" placeholder="Cari produk digital..." class="nav-search-input" value="{{ .Search }}">
+          <input type="search" name="q" placeholder="Search digital products..." class="nav-search-input" value="{{ .Search }}">
         </form>
 
         <!-- User Controls / Auth Buttons -->
@@ -115,20 +115,20 @@
                 <i class="bi bi-chevron-down small text-muted ms-1"></i>
               </button>
               <ul class="dropdown-menu dropdown-menu-end shadow-sm border mt-2 rounded-3 py-2">
-                <li><a class="dropdown-item py-2" href="/account/orders"><i class="bi bi-bag-check me-2 text-muted"></i> Pesanan Saya</a></li>
-                <li><a class="dropdown-item py-2" href="/account/settings"><i class="bi bi-person-gear me-2 text-muted"></i> Pengaturan Akun</a></li>
+                <li><a class="dropdown-item py-2" href="/account/orders"><i class="bi bi-bag-check me-2 text-muted"></i> My Orders</a></li>
+                <li><a class="dropdown-item py-2" href="/account/settings"><i class="bi bi-person-gear me-2 text-muted"></i> Account Settings</a></li>
                 {{ if .User.IsAdmin }}
                   <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item py-2 text-success fw-semibold" href="/admin"><i class="bi bi-speedometer2 me-2"></i> Panel Admin</a></li>
+                  <li><a class="dropdown-item py-2 text-success fw-semibold" href="/admin"><i class="bi bi-speedometer2 me-2"></i> Admin Panel</a></li>
                 {{ end }}
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item py-2 text-danger" href="/logout"><i class="bi bi-box-arrow-right me-2"></i> Keluar</a></li>
+                <li><a class="dropdown-item py-2 text-danger" href="/logout"><i class="bi bi-box-arrow-right me-2"></i> Sign Out</a></li>
               </ul>
             </div>
           {{ else }}
-            <a href="/login" class="storefront-nav-link px-3">Masuk</a>
+            <a href="/login" class="storefront-nav-link px-3">Sign In</a>
             <a href="/register" class="btn-spark-primary">
-              Daftar Akun
+              Create Account
             </a>
           {{ end }}
         </div>
@@ -155,15 +155,15 @@
           </svg>
         </span>
         <span class="fw-bold text-dark">Sellora</span>
-        <span class="text-muted small">&bull; &copy; 2026 Platform E-Commerce Produk Digital</span>
+        <span class="text-muted small">&bull; &copy; 2026 Digital Product Commerce Platform</span>
       </div>
       <div class="d-flex align-items-center gap-3 small">
-        <a href="/">Beranda</a>
-        <a href="/products">Katalog</a>
+        <a href="/">Home</a>
+        <a href="/products">Catalog</a>
         {{ if .User }}
-          <a href="/account/orders">Pesanan</a>
+          <a href="/account/orders">Orders</a>
         {{ else }}
-          <a href="/login">Masuk</a>
+          <a href="/login">Sign In</a>
         {{ end }}
       </div>
     </div>
@@ -181,7 +181,7 @@
       if (!text) return;
       navigator.clipboard.writeText(text).then(function() {
         const originalHTML = btn.innerHTML;
-        btn.innerHTML = '<i class="bi bi-check text-success"></i> Tersalin';
+        btn.innerHTML = '<i class="bi bi-check text-success"></i> Copied';
         setTimeout(function() {
           btn.innerHTML = originalHTML;
         }, 2000);

@@ -8,35 +8,35 @@
           <div class="mb-3">
             <i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>
           </div>
-          <h2 class="h3 fw-bold mb-2 text-dark">Pembayaran Berhasil!</h2>
+          <h2 class="h3 fw-bold mb-2 text-dark">Payment Successful!</h2>
           <p class="text-muted small mb-4">
-            Terima kasih atas pembelian Anda. Akses produk digital Anda telah aktif dan file siap diunduh langsung.
+            Thank you for your purchase! Your digital product access is now active and ready for download.
           </p>
         {{ else if eq .Order.Status "pending" }}
           <div class="mb-3">
             <i class="bi bi-hourglass-split text-warning" style="font-size: 3.5rem;"></i>
           </div>
-          <h2 class="h3 fw-bold mb-2 text-dark">Menunggu Konfirmasi Pembayaran</h2>
+          <h2 class="h3 fw-bold mb-2 text-dark">Awaiting Payment Confirmation</h2>
           <p class="text-muted small mb-4">
-            Pesanan Anda telah tercatat. Sistem sedang menunggu verifikasi pembayaran dari penyedia gateway.
+            Your order has been recorded. We are awaiting payment verification from the payment provider.
           </p>
         {{ else }}
           <div class="mb-3">
             <i class="bi bi-x-circle-fill text-danger" style="font-size: 3.5rem;"></i>
           </div>
-          <h2 class="h3 fw-bold mb-2 text-dark">Pembayaran {{ upper (printf "%s" .Order.Status) }}</h2>
+          <h2 class="h3 fw-bold mb-2 text-dark">Payment {{ upper (printf "%s" .Order.Status) }}</h2>
           <p class="text-muted small mb-4">
-            Transaksi ini belum selesai atau dibatalkan. Jika Anda merasa sudah terpotong saldo, silakan hubungi pengelola toko.
+            This transaction is incomplete or cancelled. If your account was charged, please contact customer support.
           </p>
         {{ end }}
 
         <!-- Order Information Box -->
         <div class="p-3 bg-light rounded-3 text-start mb-4 border">
           <div class="d-flex justify-content-between align-items-center mb-2 small text-muted">
-            <span>Nomor Referensi:</span>
+            <span>Reference Number:</span>
             <div class="d-flex align-items-center gap-2">
               <strong class="font-monospace text-dark">{{ .Order.Reference }}</strong>
-              <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 rounded-pill copy-ref-btn" data-clipboard="{{ .Order.Reference }}" title="Salin Nomor Referensi">
+              <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 rounded-pill copy-ref-btn" data-clipboard="{{ .Order.Reference }}" title="Copy Reference Number">
                 <i class="bi bi-clipboard"></i>
               </button>
             </div>
@@ -48,11 +48,11 @@
             </span>
           </div>
           <div class="d-flex justify-content-between mb-2 small text-muted">
-            <span>Tanggal Pesanan:</span>
+            <span>Order Date:</span>
             <span class="text-dark">{{ formatDate .Order.CreatedAt }}</span>
           </div>
           <div class="d-flex justify-content-between mb-2 small text-muted">
-            <span>Penyedia Pembayaran:</span>
+            <span>Payment Provider:</span>
             <span class="text-dark text-uppercase font-monospace small">{{ .Order.PaymentProvider }}</span>
           </div>
           {{ if gt .Order.DiscountAmount 0 }}
@@ -61,19 +61,19 @@
               <span class="text-dark">{{ formatMoney .Order.Subtotal }}</span>
             </div>
             <div class="d-flex justify-content-between mb-2 small text-success">
-              <span>Potongan Kupon{{ if .Order.Coupon }} ({{ .Order.Coupon.Code }}){{ end }}:</span>
+              <span>Coupon Discount{{ if .Order.Coupon }} ({{ .Order.Coupon.Code }}){{ end }}:</span>
               <strong>- {{ formatMoney .Order.DiscountAmount }}</strong>
             </div>
           {{ end }}
           <div class="border-top pt-2 mt-2 d-flex justify-content-between align-items-center">
-            <strong class="text-dark">{{ if eq .Order.Status "paid" }}Total Dibayar:{{ else }}Total Tagihan:{{ end }}</strong>
+            <strong class="text-dark">{{ if eq .Order.Status "paid" }}Total Paid:{{ else }}Total Amount:{{ end }}</strong>
             <strong class="text-dark fs-5 product-price">{{ formatMoney .Order.TotalAmount }}</strong>
           </div>
         </div>
 
         <!-- Purchased Line Items -->
         <div class="text-start mb-4">
-          <h6 class="fw-bold text-dark mb-2">Item Pembelian:</h6>
+          <h6 class="fw-bold text-dark mb-2">Purchased Items:</h6>
           <ul class="list-group list-group-flush rounded-3 border">
             {{ range .Order.Items }}
               <li class="list-group-item d-flex justify-content-between align-items-center py-2.5">
@@ -91,21 +91,21 @@
         <div class="d-flex flex-column gap-2">
           {{ if eq .Order.Status "paid" }}
             <a href="/account/orders" class="btn-spark-primary py-3">
-              <i class="bi bi-download me-1"></i> Buka &amp; Unduh File Pesanan
+              <i class="bi bi-download me-1"></i> Access &amp; Download Order Files
             </a>
             <a href="/products" class="btn-spark-outline py-2.5">
-              Kembali ke Katalog
+              Return to Catalog
             </a>
           {{ else if eq .Order.Status "pending" }}
             <button onclick="window.location.reload()" class="btn btn-warning rounded-pill py-2.5 fw-bold">
-              <i class="bi bi-arrow-clockwise me-1"></i> Segarkan Status
+              <i class="bi bi-arrow-clockwise me-1"></i> Refresh Status
             </button>
             <a href="/products" class="btn-spark-outline py-2.5">
-              Kembali ke Katalog
+              Return to Catalog
             </a>
           {{ else }}
             <a href="/products" class="btn-spark-outline py-2.5">
-              Kembali ke Katalog
+              Return to Catalog
             </a>
           {{ end }}
         </div>

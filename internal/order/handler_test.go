@@ -421,7 +421,7 @@ func TestApplyCoupon_InvalidCoupon(t *testing.T) {
 	}
 
 	body := rec.Body.String()
-	if !strings.Contains(body, "Kode kupon tidak ditemukan") {
+	if !strings.Contains(body, "Coupon code not found") {
 		t.Errorf("expected error message in response, got: %s", body)
 	}
 	if !strings.Contains(body, "100000") {

@@ -134,7 +134,7 @@ func (p *MidtransProvider) CreateCheckout(ctx context.Context, order *domain.Ord
 			ID:       "DISCOUNT",
 			Price:    -order.DiscountAmount,
 			Quantity: 1,
-			Name:     "Diskon Kupon",
+			Name:     "Coupon Discount",
 		})
 	}
 

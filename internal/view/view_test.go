@@ -286,7 +286,7 @@ func TestRealStorefrontCheckoutTemplates(t *testing.T) {
 		"CouponCode":      "HEMAT20",
 		"DiscountAmount":  int64(20000),
 		"TotalAmount":     int64(80000),
-		"CouponSuccess":   "Kupon HEMAT20 berhasil diterapkan!",
+		"CouponSuccess":   "Coupon HEMAT20 applied successfully!",
 	})
 	if err != nil {
 		t.Fatalf("failed to render real storefront/checkout template: %v", err)
@@ -322,7 +322,7 @@ func TestRealStorefrontCheckoutTemplates(t *testing.T) {
 	}
 	recSuccess := httptest.NewRecorder()
 	err = v.Render(recSuccess, "public", "storefront/order_success", map[string]any{
-		"Title": "Pembayaran Berhasil",
+		"Title": "Payment Successful",
 		"Order": order,
 	})
 	if err != nil {
@@ -331,8 +331,8 @@ func TestRealStorefrontCheckoutTemplates(t *testing.T) {
 	if recSuccess.Code != 200 {
 		t.Fatalf("expected status 200, got %d", recSuccess.Code)
 	}
-	if !strings.Contains(recSuccess.Body.String(), "Potongan Kupon") {
-		t.Errorf("expected rendered success to contain Potongan Kupon")
+	if !strings.Contains(recSuccess.Body.String(), "Coupon Discount") {
+		t.Errorf("expected rendered success to contain Coupon Discount")
 	}
 }
 

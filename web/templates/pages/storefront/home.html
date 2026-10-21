@@ -9,28 +9,28 @@
         <div class="col-12 col-lg-7">
           <div class="hero-spark-badge">
             <span class="hero-spark-badge-dot"></span>
-            <span>Platform Produk Digital Terkurasi</span>
+            <span>Curated Digital Products Platform</span>
           </div>
 
           <h1 class="hero-spark-title">
-            Koleksi template dan aset digital untuk kebutuhan proyek Anda.
+            Curated templates and digital assets to accelerate your projects.
           </h1>
 
           <p class="hero-spark-subtitle">
-            Dapatkan akses instan ke starter kit, boilerplate kode sumber, dan panduan teknis yang siap langsung dipakai.
+            Get instant access to starter kits, boilerplate source code, and production-ready technical resources.
           </p>
 
           <div class="d-flex flex-wrap align-items-center gap-3">
             <a href="/products" class="btn-spark-primary">
-              Jelajahi Katalog <i class="bi bi-arrow-right ms-1"></i>
+              Explore Catalog <i class="bi bi-arrow-right ms-1"></i>
             </a>
             {{ if not .User }}
               <a href="/register" class="btn-spark-outline">
-                Daftar Akun Baru
+                Create Account
               </a>
             {{ else }}
               <a href="/account/orders" class="btn-spark-outline">
-                Lihat Pesanan Saya
+                View My Orders
               </a>
             {{ end }}
           </div>
@@ -57,7 +57,7 @@
                   </g>
                 </svg>
               </span>
-              <span class="small fw-bold text-dark">Akses Unduhan Instan</span>
+              <span class="small fw-bold text-dark">Instant Download Access</span>
             </div>
           </div>
         </div>
@@ -66,7 +66,7 @@
   </div>
 </section>
 
-<!-- 2. How It Works (3 Langkah Sederhana) -->
+<!-- 2. How It Works (3 Simple Steps) -->
 <section class="py-4">
   <div class="container">
     <div class="row g-4">
@@ -75,10 +75,10 @@
           <div class="step-icon-box">
             <i class="bi bi-grid"></i>
           </div>
-          <div class="step-number">Langkah 1</div>
-          <h3 class="step-title">Pilih Produk</h3>
+          <div class="step-number">Step 1</div>
+          <h3 class="step-title">Select Product</h3>
           <p class="step-desc">
-            Temukan produk digital, template, atau starter kit yang sesuai dengan kebutuhan Anda di katalog kami.
+            Find the right digital goods, templates, or starter kits that fit your project needs in our catalog.
           </p>
         </div>
       </div>
@@ -87,10 +87,10 @@
           <div class="step-icon-box">
             <i class="bi bi-credit-card"></i>
           </div>
-          <div class="step-number">Langkah 2</div>
-          <h3 class="step-title">Pembayaran Aman</h3>
+          <div class="step-number">Step 2</div>
+          <h3 class="step-title">Secure Payment</h3>
           <p class="step-desc">
-            Selesaikan transaksi dengan aman melalui penyedia pembayaran resmi yang terintegrasi langsung.
+            Complete your purchase securely via officially integrated payment gateways.
           </p>
         </div>
       </div>
@@ -99,10 +99,10 @@
           <div class="step-icon-box">
             <i class="bi bi-download"></i>
           </div>
-          <div class="step-number">Langkah 3</div>
-          <h3 class="step-title">Unduh Instan</h3>
+          <div class="step-number">Step 3</div>
+          <h3 class="step-title">Instant Download</h3>
           <p class="step-desc">
-            Setelah pembayaran terkonfirmasi, file produk langsung tersedia di halaman akun Anda untuk diunduh kapan saja.
+            Once payment is confirmed, files are immediately available in your account to download anytime.
           </p>
         </div>
       </div>
@@ -115,11 +115,11 @@
   <div class="container">
     <div class="d-flex align-items-end justify-content-between mb-4">
       <div>
-        <h2 class="h3 fw-bold mb-1">Produk Terbaru</h2>
-        <p class="text-muted small mb-0">Pilihan aset dan kit siap pakai untuk mempercepat proyek Anda.</p>
+        <h2 class="h3 fw-bold mb-1">Featured Products</h2>
+        <p class="text-muted small mb-0">Production-ready assets and kits to accelerate your development.</p>
       </div>
       <a href="/products" class="btn-spark-outline small">
-        Lihat Semua ({{ .TotalPublished }}) <i class="bi bi-arrow-right ms-1"></i>
+        View All ({{ .TotalPublished }}) <i class="bi bi-arrow-right ms-1"></i>
       </a>
     </div>
 
@@ -135,7 +135,7 @@
                   {{ else }}
                     <div class="thumb-placeholder">
                       <i class="bi bi-box-seam thumb-icon"></i>
-                      <span class="small fw-semibold">Produk Digital</span>
+                      <span class="small fw-semibold">Digital Product</span>
                     </div>
                   {{ end }}
                 </div>
@@ -156,7 +156,7 @@
 
               <div class="p-3 pt-0">
                 <a href="/products/{{ .Slug }}" class="btn-spark-primary w-100 py-2.5 small fw-semibold">
-                  Lihat Detail Produk
+                  View Details
                 </a>
               </div>
             </div>
@@ -166,11 +166,11 @@
     {{ else }}
       <div class="text-center py-5 bg-white rounded-4 border">
         <i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
-        <h5 class="fw-bold">Belum Ada Produk</h5>
-        <p class="text-muted small">Produk digital sedang disiapkan dan akan segera tersedia di katalog.</p>
+        <h5 class="fw-bold">No Products Yet</h5>
+        <p class="text-muted small">Digital products are being prepared and will be available in the catalog soon.</p>
         {{ if and .User .User.IsAdmin }}
           <a href="/admin/products/new" class="btn-spark-primary mt-2">
-            <i class="bi bi-plus-lg me-1"></i> Tambah Produk di Admin
+            <i class="bi bi-plus-lg me-1"></i> Add Product in Admin
           </a>
         {{ end }}
       </div>
@@ -182,8 +182,8 @@
 <section class="py-5 bg-white border-top border-bottom">
   <div class="container" style="max-width: 860px;">
     <div class="text-center mb-5">
-      <h2 class="h3 fw-bold mb-2">Pertanyaan Umum (FAQ)</h2>
-      <p class="text-muted small">Jawaban untuk pertanyaan yang sering diajukan seputar produk dan transaksi.</p>
+      <h2 class="h3 fw-bold mb-2">Frequently Asked Questions (FAQ)</h2>
+      <p class="text-muted small">Answers to commonly asked questions about products and transactions.</p>
     </div>
 
     <div class="accordion" id="faqAccordion">
@@ -191,12 +191,12 @@
       <div class="accordion-item">
         <h2 class="accordion-header" id="faqHeading1">
           <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
-            Bagaimana cara mendapatkan file setelah pembayaran?
+            How do I get my files after payment?
           </button>
         </h2>
         <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1" data-bs-parent="#faqAccordion">
           <div class="accordion-body">
-            Setelah pembayaran Anda diverifikasi oleh gerbang pembayaran, pesanan Anda akan langsung berstatus lunas. Tautan unduh produk akan otomatis aktif dan dapat diakses kapan saja melalui halaman <strong>Pesanan Saya</strong> di akun Anda.
+            Once your payment is verified by the payment gateway, your order is instantly marked as paid. Product download links activate automatically and can be accessed anytime from <strong>My Orders</strong> in your account.
           </div>
         </div>
       </div>
@@ -205,12 +205,12 @@
       <div class="accordion-item">
         <h2 class="accordion-header" id="faqHeading2">
           <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
-            Metode pembayaran apa saja yang didukung?
+            What payment methods are supported?
           </button>
         </h2>
         <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2" data-bs-parent="#faqAccordion">
           <div class="accordion-body">
-            Kami mendukung berbagai metode pembayaran melalui penyedia resmi terintegrasi (seperti QRIS, transfer bank virtual account, kartu kredit, dan e-wallet) untuk menjamin keamanan setiap transaksi Anda.
+            We support multiple payment methods through officially integrated providers (including QRIS, virtual accounts, credit cards, and e-wallets) to ensure safe and smooth transactions.
           </div>
         </div>
       </div>
@@ -219,12 +219,12 @@
       <div class="accordion-item">
         <h2 class="accordion-header" id="faqHeading3">
           <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
-            Apakah saya bisa mengunduh ulang produk yang sudah dibeli?
+            Can I re-download purchased products?
           </button>
         </h2>
         <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" data-bs-parent="#faqAccordion">
           <div class="accordion-body">
-            Ya! Seluruh produk yang sudah Anda beli tersimpan secara permanen di riwayat akun Sellora Anda. Anda dapat mengunduh kembali file produk tersebut kapan pun Anda membutuhkannya tanpa biaya tambahan.
+            Yes! All products you have purchased remain permanently saved in your Sellora account history. You can re-download them whenever you need at no extra charge.
           </div>
         </div>
       </div>
@@ -236,12 +236,12 @@
 <section class="py-5">
   <div class="container">
     <div class="hero-spark-card text-center py-5">
-      <h2 class="h3 fw-bold text-dark mb-2">Siap memulai proyek Anda berikutnya?</h2>
+      <h2 class="h3 fw-bold text-dark mb-2">Ready to launch your next project?</h2>
       <p class="hero-spark-subtitle mx-auto mb-4" style="max-width: 520px;">
-        Jelajahi seluruh katalog kami dan dapatkan template berkualitas yang siap langsung diintegrasikan.
+        Explore our complete catalog and discover high-quality templates ready for immediate integration.
       </p>
       <a href="/products" class="btn-spark-primary">
-        Buka Katalog Lengkap <i class="bi bi-arrow-right ms-1"></i>
+        Browse Full Catalog <i class="bi bi-arrow-right ms-1"></i>
       </a>
     </div>
   </div>

@@ -16,8 +16,8 @@
   <!-- Breadcrumb Navigation -->
   <nav aria-label="breadcrumb" class="mb-4">
     <ol class="breadcrumb mb-0 small">
-      <li class="breadcrumb-item"><a href="/" class="text-muted">Beranda</a></li>
-      <li class="breadcrumb-item"><a href="/products" class="text-muted">Katalog</a></li>
+      <li class="breadcrumb-item"><a href="/" class="text-muted">Home</a></li>
+      <li class="breadcrumb-item"><a href="/products" class="text-muted">Catalog</a></li>
       <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">{{ .Product.Name }}</li>
     </ol>
   </nav>
@@ -44,28 +44,28 @@
           {{ else }}
             <div class="thumb-placeholder">
               <i class="bi bi-box-seam thumb-icon"></i>
-              <span class="small fw-semibold">Produk Digital</span>
+              <span class="small fw-semibold">Digital Product</span>
             </div>
           {{ end }}
         </div>
 
         {{ if .Product.Images }}
-          <div class="gallery-thumbnails-strip" aria-label="Galeri Gambar Produk">
+          <div class="gallery-thumbnails-strip" aria-label="Product Image Gallery">
             {{ if .Product.ThumbnailURL }}
               <button type="button"
                       class="gallery-thumb-btn active"
-                      aria-label="Gambar Sampul"
+                      aria-label="Cover Image"
                       onclick="selectGalleryImage(this, '{{ .Product.ThumbnailURL }}')">
-                <img src="{{ .Product.ThumbnailURL }}" alt="Thumbnail Sampul">
+                <img src="{{ .Product.ThumbnailURL }}" alt="Cover Thumbnail">
               </button>
             {{ end }}
             {{ range $idx, $img := .Product.Images }}
               {{ if ne $img.ImageURL $.Product.ThumbnailURL }}
                 <button type="button"
                         class="gallery-thumb-btn {{ if and (not $.Product.ThumbnailURL) (eq $idx 0) }}active{{ end }}"
-                        aria-label="Gambar Pratinjau {{ add $idx 1 }}"
+                        aria-label="Preview Image {{ add $idx 1 }}"
                         onclick="selectGalleryImage(this, '{{ $img.ImageURL }}')">
-                  <img src="{{ $img.ImageURL }}" alt="Pratinjau {{ add $idx 1 }}">
+                  <img src="{{ $img.ImageURL }}" alt="Preview {{ add $idx 1 }}">
                 </button>
               {{ end }}
             {{ end }}
@@ -80,16 +80,16 @@
       <div class="d-flex flex-wrap gap-4 text-muted small pb-4 mb-4 border-bottom">
         <div>
           <i class="bi bi-calendar3 me-1 text-success"></i>
-          Rilis: <strong>{{ formatDateShort .Product.CreatedAt }}</strong>
+          Released: <strong>{{ formatDateShort .Product.CreatedAt }}</strong>
         </div>
         <div>
           <i class="bi bi-file-earmark-zip me-1 text-success"></i>
-          Paket: <strong>{{ .TotalFiles }} file</strong>
+          Package: <strong>{{ .TotalFiles }} files</strong>
         </div>
         {{ if gt .TotalSize 0 }}
         <div>
           <i class="bi bi-hdd-network me-1 text-success"></i>
-          Ukuran Total: <strong>{{ formatBytes .TotalSize }}</strong>
+          Total Size: <strong>{{ formatBytes .TotalSize }}</strong>
         </div>
         {{ end }}
       </div>
@@ -100,34 +100,34 @@
       <div class="mb-5">
         <div class="d-flex align-items-center justify-content-between mb-3">
           <h4 class="h5 fw-bold mb-0">
-            <i class="bi bi-play-circle-fill text-danger me-2"></i> Demo &amp; Pratinjau Video
+            <i class="bi bi-play-circle-fill text-danger me-2"></i> Demo &amp; Video Preview
           </h4>
           <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1 rounded-pill small">
-            Video Langsung
+            Live Video
           </span>
         </div>
         <div class="ratio ratio-16x9 rounded-4 overflow-hidden border shadow-sm bg-dark">
           <iframe src="{{ $videoEmbed }}"
-                  title="Video Demo {{ .Product.Name }}"
+                  title="Demo Video {{ .Product.Name }}"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowfullscreen
                   loading="lazy">
           </iframe>
         </div>
         <p class="text-muted small mt-2 mb-0">
-          <i class="bi bi-info-circle me-1"></i> Tonton demo interaktif untuk melihat tampilan dan fitur produk sebelum membeli.
+          <i class="bi bi-info-circle me-1"></i> Watch the interactive demo to preview the product interface and features before purchasing.
         </p>
       </div>
       {{ end }}
 
       <!-- Full Description (Rendered Markdown) -->
       <div class="mb-5">
-        <h4 class="h5 fw-bold mb-3">Deskripsi Produk</h4>
+        <h4 class="h5 fw-bold mb-3">Product Description</h4>
         <div class="text-secondary lh-lg markdown-body bg-white p-4 rounded-4 border">
           {{ if .Product.FullDescription }}
             {{ renderMarkdown .Product.FullDescription }}
           {{ else }}
-            <p class="text-muted fst-italic mb-0">Belum ada dokumentasi tambahan untuk produk ini.</p>
+            <p class="text-muted fst-italic mb-0">No additional documentation available for this product yet.</p>
           {{ end }}
         </div>
       </div>
@@ -136,14 +136,14 @@
       <div class="spark-card mb-4">
         <div class="d-flex align-items-center justify-content-between mb-3">
           <h5 class="h6 fw-bold mb-0">
-            <i class="bi bi-folder-check text-success me-2"></i> File Termasuk
+            <i class="bi bi-folder-check text-success me-2"></i> Included Files
           </h5>
           <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 rounded-pill small">
-            {{ .TotalFiles }} File
+            {{ .TotalFiles }} Files
           </span>
         </div>
         <p class="text-muted small mb-3">
-          File berikut akan langsung terbuka untuk diunduh setelah pembayaran terkonfirmasi.
+          The following files will be unlocked for download immediately after payment confirmation.
         </p>
 
         {{ if .Files }}
@@ -175,7 +175,7 @@
           </div>
         {{ else }}
           <div class="p-3 bg-light rounded-3 text-muted small text-center">
-            File sedang dipersiapkan dan belum dilampirkan.
+            Files are being prepared and have not been attached yet.
           </div>
         {{ end }}
       </div>
@@ -186,9 +186,9 @@
       <div class="purchase-sticky-card">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 small">
-            <i class="bi bi-check-circle me-1"></i> Tersedia
+            <i class="bi bi-check-circle me-1"></i> Available
           </span>
-          <span class="text-muted small">Akses Langsung</span>
+          <span class="text-muted small">Instant Access</span>
         </div>
 
         <div class="d-flex align-items-baseline gap-2 mb-3 mt-3">
@@ -197,27 +197,27 @@
 
         <div class="alert bg-success-subtle text-success border-0 py-2.5 px-3 small rounded-3 mb-4 d-flex align-items-center gap-2">
           <i class="bi bi-lightning-charge-fill"></i>
-          <span>Unduhan instan terbuka setelah checkout</span>
+          <span>Instant download unlocked right after checkout</span>
         </div>
 
         <!-- Checkout Action -->
         <a href="/checkout/{{ .Product.ID }}" class="btn-spark-primary w-100 py-3 fw-bold mb-3 fs-6">
-          Beli Sekarang &bull; {{ formatMoney .Product.Price }}
+          Buy Now &bull; {{ formatMoney .Product.Price }}
         </a>
 
         <!-- Guarantees Checklist -->
         <ul class="list-unstyled d-flex flex-column gap-2 small text-muted mb-0 mt-3 pt-3 border-top">
           <li class="d-flex align-items-center gap-2">
             <i class="bi bi-check-circle-fill text-success"></i>
-            <span>File langsung tersedia di akun pembeli</span>
+            <span>Files immediately accessible in customer account</span>
           </li>
           <li class="d-flex align-items-center gap-2">
             <i class="bi bi-check-circle-fill text-success"></i>
-            <span>Verifikasi integritas file SHA-256</span>
+            <span>SHA-256 file integrity verification</span>
           </li>
           <li class="d-flex align-items-center gap-2">
             <i class="bi bi-check-circle-fill text-success"></i>
-            <span>Dukungan langsung dari pengelola Sellora</span>
+            <span>Direct customer support from Sellora</span>
           </li>
         </ul>
       </div>

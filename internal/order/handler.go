@@ -103,7 +103,7 @@ func (h *Handler) CheckoutPage(w http.ResponseWriter, r *http.Request) {
 			appliedCoupon = c
 			discountAmount = disc
 			totalAmount = product.Price - disc
-			couponSuccess = fmt.Sprintf("Kupon %s berhasil diterapkan!", c.Code)
+			couponSuccess = fmt.Sprintf("Coupon %s applied successfully!", c.Code)
 		}
 	}
 
@@ -152,7 +152,7 @@ func (h *Handler) ApplyCoupon(w http.ResponseWriter, r *http.Request) {
 	totalAmount := product.Price
 
 	if couponCode == "" {
-		couponError = "Silakan masukkan kode kupon."
+		couponError = "Please enter a coupon code."
 	} else if h.couponService != nil {
 		c, disc, err := h.couponService.ValidateAndCalculate(r.Context(), couponCode, product.Price)
 		if err != nil {
@@ -161,7 +161,7 @@ func (h *Handler) ApplyCoupon(w http.ResponseWriter, r *http.Request) {
 			appliedCoupon = c
 			discountAmount = disc
 			totalAmount = product.Price - disc
-			couponSuccess = fmt.Sprintf("Kupon %s berhasil diterapkan!", c.Code)
+			couponSuccess = fmt.Sprintf("Coupon %s applied successfully!", c.Code)
 		}
 	}
 
@@ -239,23 +239,23 @@ func (h *Handler) ProcessCheckout(w http.ResponseWriter, r *http.Request) {
 		CouponCode: couponCode,
 	})
 	if err != nil {
-		errMsg := "Gagal memproses pesanan. Silakan coba lagi."
+		errMsg := "Failed to process order. Please try again."
 		if errors.Is(err, ErrAlreadyPurchased) {
-			errMsg = "Anda sudah pernah membeli produk digital ini."
+			errMsg = "You have already purchased this digital product."
 		} else if errors.Is(err, ErrProductNotAvailable) {
-			errMsg = "Produk ini saat ini tidak tersedia."
+			errMsg = "This product is currently not available."
 		} else if errors.Is(err, domain.ErrCouponNotFound) {
-			errMsg = "Kode kupon tidak ditemukan."
+			errMsg = "Coupon code not found."
 		} else if errors.Is(err, domain.ErrCouponInactive) {
-			errMsg = "Kupon saat ini sedang tidak aktif."
+			errMsg = "This coupon is currently inactive."
 		} else if errors.Is(err, domain.ErrCouponExpired) {
-			errMsg = "Kupon telah kedaluwarsa."
+			errMsg = "This coupon has expired."
 		} else if errors.Is(err, domain.ErrCouponNotStarted) {
-			errMsg = "Promo kupon belum dimulai."
+			errMsg = "Coupon promotion has not started yet."
 		} else if errors.Is(err, domain.ErrCouponLimitReached) {
-			errMsg = "Kuota pemakaian kupon telah habis."
+			errMsg = "Coupon usage limit has been reached."
 		} else if errors.Is(err, domain.ErrCouponMinPurchase) {
-			errMsg = "Total belanja belum memenuhi minimum pembelian kupon ini."
+			errMsg = "Order total does not meet the minimum purchase requirement for this coupon."
 		}
 
 		product, fetchErr := h.productRepo.FindByID(r.Context(), productID)
@@ -302,27 +302,27 @@ func (h *Handler) ProcessCheckout(w http.ResponseWriter, r *http.Request) {
 
 func translateCouponError(err error) string {
 	if errors.Is(err, domain.ErrCouponNotFound) || errors.Is(err, domain.ErrNotFound) {
-		return "Kode kupon tidak ditemukan."
+		return "Coupon code not found."
 	}
 	if errors.Is(err, domain.ErrCouponInactive) {
-		return "Kupon saat ini sedang tidak aktif."
+		return "This coupon is currently inactive."
 	}
 	if errors.Is(err, domain.ErrCouponExpired) {
-		return "Kupon telah kedaluwarsa."
+		return "This coupon has expired."
 	}
 	if errors.Is(err, domain.ErrCouponNotStarted) {
-		return "Promo kupon belum dimulai."
+		return "Coupon promotion has not started yet."
 	}
 	if errors.Is(err, domain.ErrCouponLimitReached) {
-		return "Batas kuota pemakaian kupon telah tercapai."
+		return "Coupon usage limit has been reached."
 	}
 	if errors.Is(err, domain.ErrCouponMinPurchase) {
-		return "Total belanja belum memenuhi minimum pembelian untuk kupon ini."
+		return "Order total does not meet the minimum purchase requirement for this coupon."
 	}
 	if errors.Is(err, domain.ErrCouponInvalidCode) {
-		return "Format kode kupon tidak valid."
+		return "Invalid coupon code format."
 	}
-	return "Kupon tidak dapat digunakan."
+	return "Coupon cannot be applied."
 }
 
 // OrderSuccess renders order summary and status details after checkout redirection.

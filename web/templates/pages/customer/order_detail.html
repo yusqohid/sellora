@@ -5,7 +5,7 @@
       <!-- Breadcrumb & Back -->
       <div class="mb-4">
         <a href="/account/orders" class="text-muted small">
-          <i class="bi bi-arrow-left me-1"></i> Kembali ke Pesanan Saya
+          <i class="bi bi-arrow-left me-1"></i> Back to My Orders
         </a>
       </div>
 
@@ -14,10 +14,10 @@
         <div class="bg-light p-4 border-bottom">
           <div class="d-flex justify-content-between align-items-start">
             <div>
-              <span class="text-muted small text-uppercase fw-bold">Rincian Pembelian</span>
+              <span class="text-muted small text-uppercase fw-bold">Purchase Details</span>
               <div class="d-flex align-items-center gap-2 mt-1">
                 <h2 class="h4 fw-bold text-dark mb-0 font-monospace">{{ .Order.Reference }}</h2>
-                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 rounded-pill copy-ref-btn" data-clipboard="{{ .Order.Reference }}" title="Salin Referensi">
+                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 rounded-pill copy-ref-btn" data-clipboard="{{ .Order.Reference }}" title="Copy Reference">
                   <i class="bi bi-clipboard"></i>
                 </button>
               </div>
@@ -25,15 +25,15 @@
             <div>
               {{ if eq .Order.Status "paid" }}
                 <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill fw-semibold">
-                  <i class="bi bi-check-circle-fill me-1"></i> Lunas
+                  <i class="bi bi-check-circle-fill me-1"></i> Paid
                 </span>
               {{ else if eq .Order.Status "pending" }}
                 <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 rounded-pill fw-semibold">
-                  <i class="bi bi-clock-fill me-1"></i> Menunggu Pembayaran
+                  <i class="bi bi-clock-fill me-1"></i> Pending Payment
                 </span>
               {{ else if eq .Order.Status "failed" }}
                 <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 rounded-pill fw-semibold">
-                  <i class="bi bi-x-circle-fill me-1"></i> Gagal
+                  <i class="bi bi-x-circle-fill me-1"></i> Failed
                 </span>
               {{ else }}
                 <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2 rounded-pill fw-semibold text-capitalize">
@@ -48,27 +48,27 @@
         <div class="p-4">
           <div class="row g-3 mb-4 pb-4 border-bottom text-muted small">
             <div class="col-sm-4">
-              <span class="d-block text-muted">Tanggal:</span>
+              <span class="d-block text-muted">Date:</span>
               <strong class="text-dark">{{ formatDate .Order.CreatedAt }}</strong>
             </div>
             <div class="col-sm-4">
-              <span class="d-block text-muted">Metode Pembayaran:</span>
+              <span class="d-block text-muted">Payment Method:</span>
               <strong class="text-dark text-uppercase">{{ .Order.PaymentProvider }}</strong>
             </div>
             <div class="col-sm-4">
-              <span class="d-block text-muted">Referensi Gateway:</span>
+              <span class="d-block text-muted">Gateway Reference:</span>
               <strong class="text-dark">{{ if .Order.PaymentReference }}{{ .Order.PaymentReference }}{{ else }}—{{ end }}</strong>
             </div>
           </div>
 
           <!-- Line Items & Downloads -->
-          <h5 class="fw-bold text-dark mb-3">Item Pembelian</h5>
+          <h5 class="fw-bold text-dark mb-3">Purchased Items</h5>
           <div class="table-responsive mb-4">
             <table class="table align-middle">
               <thead class="table-light small">
                 <tr>
-                  <th>Produk</th>
-                  <th class="text-end">Harga</th>
+                  <th>Product</th>
+                  <th class="text-end">Price</th>
                 </tr>
               </thead>
               <tbody>
@@ -83,13 +83,13 @@
                           <div class="mt-2 d-flex flex-wrap gap-2">
                             {{ range $files }}
                               <a href="/downloads/{{ .ID }}" class="btn btn-sm btn-spark-primary py-1 px-3">
-                                <i class="bi bi-download me-1"></i> Unduh {{ .OriginalName }}
+                                <i class="bi bi-download me-1"></i> Download {{ .OriginalName }}
                                 {{ if .FileSize }}<span class="opacity-75 small">({{ formatBytes .FileSize }})</span>{{ end }}
                               </a>
                             {{ end }}
                           </div>
                         {{ else }}
-                          <span class="text-muted small d-block mt-1">Belum ada file unduhan yang dilampirkan pada produk ini.</span>
+                          <span class="text-muted small d-block mt-1">No download files attached to this product yet.</span>
                         {{ end }}
                       {{ end }}
                     </td>
@@ -104,7 +104,7 @@
                     <td class="text-end fw-medium text-dark">{{ formatMoney .Order.Subtotal }}</td>
                   </tr>
                   <tr>
-                    <td class="text-end text-success small">Potongan Kupon{{ if .Order.Coupon }} ({{ .Order.Coupon.Code }}){{ end }}:</td>
+                    <td class="text-end text-success small">Coupon Discount{{ if .Order.Coupon }} ({{ .Order.Coupon.Code }}){{ end }}:</td>
                     <td class="text-end fw-bold text-success">- {{ formatMoney .Order.DiscountAmount }}</td>
                   </tr>
                 {{ end }}
@@ -118,10 +118,10 @@
 
           <div class="d-flex justify-content-between align-items-center pt-3 border-top">
             <a href="/account/orders" class="btn btn-spark-outline px-4">
-              Kembali ke Pesanan
+              Back to Orders
             </a>
             <button onclick="window.print()" class="btn btn-spark-outline px-4">
-              <i class="bi bi-printer me-1"></i> Cetak Bukti
+              <i class="bi bi-printer me-1"></i> Print Receipt
             </button>
           </div>
         </div>
