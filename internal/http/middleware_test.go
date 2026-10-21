@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	appHTTP "github.com/yusqohid/go-htmx-ecommerce/internal/http"
 )
@@ -103,4 +104,65 @@ func TestPanicRecovery_AbortHandler(t *testing.T) {
 	}()
 
 	abortHandler.ServeHTTP(rec, req)
+}
+
+func TestRateLimiter(t *testing.T) {
+	limiter := appHTTP.RateLimiter(3, 100*time.Millisecond)
+
+	nextCalled := 0
+	handler := limiter(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		nextCalled++
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	req := httptest.NewRequest(http.MethodPost, "/login", nil)
+	req.RemoteAddr = "192.168.1.50:1234"
+
+	// 1st request -> 200 OK
+	rec1 := httptest.NewRecorder()
+	handler.ServeHTTP(rec1, req)
+	if rec1.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK, got %d", rec1.Code)
+	}
+
+	// 2nd request -> 200 OK
+	rec2 := httptest.NewRecorder()
+	handler.ServeHTTP(rec2, req)
+	if rec2.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK, got %d", rec2.Code)
+	}
+
+	// 3rd request -> 200 OK
+	rec3 := httptest.NewRecorder()
+	handler.ServeHTTP(rec3, req)
+	if rec3.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK, got %d", rec3.Code)
+	}
+
+	// 4th request -> 429 Too Many Requests
+	rec4 := httptest.NewRecorder()
+	handler.ServeHTTP(rec4, req)
+	if rec4.Code != http.StatusTooManyRequests {
+		t.Fatalf("expected 429 Too Many Requests, got %d", rec4.Code)
+	}
+	if rec4.Header().Get("Retry-After") == "" {
+		t.Errorf("expected Retry-After header to be present")
+	}
+
+	// Different IP should still be allowed
+	reqDifferentIP := httptest.NewRequest(http.MethodPost, "/login", nil)
+	reqDifferentIP.RemoteAddr = "192.168.1.99:5678"
+	recDiff := httptest.NewRecorder()
+	handler.ServeHTTP(recDiff, reqDifferentIP)
+	if recDiff.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK for different IP, got %d", recDiff.Code)
+	}
+
+	// After window expires, original IP should be permitted again
+	time.Sleep(120 * time.Millisecond)
+	rec5 := httptest.NewRecorder()
+	handler.ServeHTTP(rec5, req)
+	if rec5.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK after window expiration, got %d", rec5.Code)
+	}
 }

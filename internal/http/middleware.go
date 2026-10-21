@@ -6,9 +6,12 @@ import (
 	"crypto/subtle"
 	"encoding/hex"
 	"log/slog"
+	"net"
 	"net/http"
 	"runtime/debug"
+	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-chi/chi/v5/middleware"
@@ -217,6 +220,66 @@ func PanicRecovery(logger *slog.Logger) func(http.Handler) http.Handler {
 </html>`))
 				}
 			}()
+
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
+type clientRate struct {
+	count       int
+	windowStart time.Time
+}
+
+// RateLimiter returns an HTTP middleware that limits the number of requests per client IP within a rolling time window.
+// It uses an in-memory store with opportunistic cleanup of expired records.
+func RateLimiter(limit int, window time.Duration) func(http.Handler) http.Handler {
+	var mu sync.Mutex
+	clients := make(map[string]*clientRate)
+	var lastCleanup time.Time
+
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ip := r.RemoteAddr
+			if host, _, err := net.SplitHostPort(ip); err == nil {
+				ip = host
+			}
+
+			mu.Lock()
+			now := time.Now()
+
+			// Opportunistic cleanup of expired client records
+			if lastCleanup.IsZero() || now.Sub(lastCleanup) > window {
+				for k, v := range clients {
+					if now.Sub(v.windowStart) >= window {
+						delete(clients, k)
+					}
+				}
+				lastCleanup = now
+			}
+
+			entry, exists := clients[ip]
+			if !exists || now.Sub(entry.windowStart) >= window {
+				clients[ip] = &clientRate{count: 1, windowStart: now}
+				mu.Unlock()
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			if entry.count >= limit {
+				retryAfter := int(window.Seconds() - now.Sub(entry.windowStart).Seconds())
+				if retryAfter < 1 {
+					retryAfter = 1
+				}
+				mu.Unlock()
+
+				w.Header().Set("Retry-After", strconv.Itoa(retryAfter))
+				http.Error(w, "Too many requests. Please try again later.", http.StatusTooManyRequests)
+				return
+			}
+
+			entry.count++
+			mu.Unlock()
 
 			next.ServeHTTP(w, r)
 		})

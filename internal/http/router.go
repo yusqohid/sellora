@@ -102,12 +102,13 @@ func NewRouter(deps RouterDeps) http.Handler {
 
 	// Public / Guest authentication routes
 	if deps.AuthHandler != nil {
+		authRateLimit := RateLimiter(10, time.Minute)
 		r.Group(func(guest chi.Router) {
 			guest.Use(auth.RequireGuest("/"))
 			guest.Get("/login", deps.AuthHandler.ShowLogin)
-			guest.Post("/login", deps.AuthHandler.Login)
+			guest.With(authRateLimit).Post("/login", deps.AuthHandler.Login)
 			guest.Get("/register", deps.AuthHandler.ShowRegister)
-			guest.Post("/register", deps.AuthHandler.Register)
+			guest.With(authRateLimit).Post("/register", deps.AuthHandler.Register)
 		})
 
 		r.Post("/logout", deps.AuthHandler.Logout)
@@ -123,11 +124,12 @@ func NewRouter(deps RouterDeps) http.Handler {
 
 	// Order & Checkout routes
 	if deps.OrderHandler != nil {
+		checkoutRateLimit := RateLimiter(20, time.Minute)
 		// Checkout flow requires customer authentication
 		r.Group(func(authRouter chi.Router) {
 			authRouter.Use(auth.RequireAuth("/login"))
 			authRouter.Get("/checkout/{productID}", deps.OrderHandler.CheckoutPage)
-			authRouter.Post("/checkout/{productID}", deps.OrderHandler.ProcessCheckout)
+			authRouter.With(checkoutRateLimit).Post("/checkout/{productID}", deps.OrderHandler.ProcessCheckout)
 			authRouter.Post("/checkout/{productID}/apply-coupon", deps.OrderHandler.ApplyCoupon)
 			authRouter.Post("/checkout/{productID}/remove-coupon", deps.OrderHandler.RemoveCoupon)
 		})
@@ -148,18 +150,20 @@ func NewRouter(deps RouterDeps) http.Handler {
 
 	// Secure Digital Product Downloads (requires customer authentication & paid order)
 	if deps.DownloadHandler != nil {
-		r.Get("/downloads/{fileID}", deps.DownloadHandler.DownloadFile)
+		downloadRateLimit := RateLimiter(30, time.Minute)
+		r.With(downloadRateLimit).Get("/downloads/{fileID}", deps.DownloadHandler.DownloadFile)
 	}
 
 	// Customer Account & Order History
 	if deps.CustomerHandler != nil {
+		passwordRateLimit := RateLimiter(10, time.Minute)
 		r.Group(func(cust chi.Router) {
 			cust.Use(auth.RequireAuth("/login"))
 			cust.Get("/account", deps.CustomerHandler.AccountHome)
 			cust.Get("/account/orders", deps.CustomerHandler.ListOrders)
 			cust.Get("/account/orders/{id}", deps.CustomerHandler.OrderDetail)
 			cust.Get("/account/settings", deps.CustomerHandler.Settings)
-			cust.Post("/account/settings/password", deps.CustomerHandler.UpdatePassword)
+			cust.With(passwordRateLimit).Post("/account/settings/password", deps.CustomerHandler.UpdatePassword)
 		})
 	}
 	// Protected Admin Dashboard & Product Management
